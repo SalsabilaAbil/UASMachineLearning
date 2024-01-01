@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from mlxtend.frequent_patterns import association_rules, apriori
 import matplotlib.pyplot as plt
-import seaborn as sns
+
 # Sample data
 data = pd.DataFrame({
     'Transaction': [1, 1, 2, 2, 3, 3, 4, 4],
