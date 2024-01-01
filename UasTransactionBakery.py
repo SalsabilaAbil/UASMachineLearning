@@ -18,12 +18,9 @@ def main():
     st.title("Association Rule Mining with Apriori Algorithm")
 
     # Upload CSV file
-    st.sidebar.header("Upload Data")
-    uploaded_file = st.sidebar.file_uploader("Choose a CSV file", type=["csv"])
+    uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
 
     if uploaded_file is not None:
-        st.sidebar.success("File uploaded successfully!")
-
         # Load data
         data = pd.read_csv(uploaded_file)
 
@@ -32,8 +29,8 @@ def main():
         st.write(data)
 
         # Set parameters
-        min_support = st.sidebar.slider("Minimum Support", 0.0, 1.0, 0.1, step=0.01)
-        min_confidence = st.sidebar.slider("Minimum Confidence", 0.0, 1.0, 0.5, step=0.01)
+        min_support = st.slider("Minimum Support", 0.0, 1.0, 0.1, step=0.01)
+        min_confidence = st.slider("Minimum Confidence", 0.0, 1.0, 0.5, step=0.01)
 
         # Generate association rules
         rules = generate_association_rules(data, min_support, min_confidence)
