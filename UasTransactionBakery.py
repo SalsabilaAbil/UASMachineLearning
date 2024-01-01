@@ -1,76 +1,73 @@
 import streamlit as st
 import pandas as pd
-from mlxtend.frequent_patterns import association_rules, apriori
+from mlxtend.frequent_patterns import apriori, association_rules
+import networkx as nx
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 # Load the dataset
-df = pd.read_csv('Groceries_dataset.csv')
-df['Date'] = pd.to_datetime(df['Date'], format="%d-%m-%Y")
+@st.cache
+def load_data():
+    url = "https://raw.githubusercontent.com/stedy/Machine-Learning-with-R-datasets/master/breadbasket_dms.csv"
+    data = pd.read_csv(url)
+    return data
 
-df["month"] = df['Date'].dt.month
-df["day"] = df['Date'].dt.weekday
+# Preprocess the data
+def preprocess_data(data):
+    data["Item"] = data["Item"].str.lower().str.strip()
+    return data
 
-df["month"].replace([i for i in range(1, 12 + 1)], ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"], inplace=True)
-df["day"].replace([i for i in range(6 + 1)], ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], inplace=True)
+# Mine association rules
+def mine_association_rules(data, min_support=0.01):
+    item_count = data.groupby(["Transaction", "Item"])["Item"].count().reset_index(name="Count")
+    item_count_pivot = item_count.pivot_table(index='Transaction', columns='Item', values='Count', aggfunc='sum').fillna(0)
+    item_count_pivot = item_count_pivot.astype("int32")
+    item_count_pivot = item_count_pivot.applymap(lambda x: 1 if x >= 1 else 0)
+    frequent_items = apriori(item_count_pivot, min_support=min_support, use_colnames=True)
+    rules = association_rules(frequent_items, metric="lift", min_threshold=1)
+    return rules
 
-st.title("UAS Grocery Basket Analysis Algoritma Apriori")
+# Draw the network graph
+def draw_graph(rules, rules_to_show=10):
+    G = nx.DiGraph()
 
-def get_data(month='', day=''):
-    data = df.copy()
-    filtered = data.loc[
-        (data["month"].str.contains(month.title())) &
-        (data["day"].str.contains(day.title()))
-    ]
-    return filtered if not filtered.empty else "No Result!"
+    for i in range(rules_to_show):
+        antecedents = list(rules.iloc[i]['antecedents'])
+        consequents = list(rules.iloc[i]['consequents'])
 
-def user_input_features():
-    item = st.selectbox("Item", df['itemDescription'].unique())
-    month = st.select_slider("Month", ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"])
-    day = st.select_slider("Day", ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], value='Senin')
+        for antecedent in antecedents:
+            G.add_edge(antecedent, f"Rule {i}")
 
-    return item, month, day
+        for consequent in consequents:
+            G.add_edge(f"Rule {i}", consequent)
 
-item, month, day = user_input_features()
+    pos = nx.spring_layout(G, k=16, scale=1)
+    nx.draw(G, pos, with_labels=True, font_size=8, node_size=2000, node_color="skyblue", font_color="black", font_weight="bold")
+    st.pyplot()
 
-data = get_data(month, day)
+# Streamlit app
+def main():
+    st.title("Bakery Association Rule Mining App")
 
-def encode(x):
-    return 1 if x >= 1 else 0
+    # Load data
+    data = load_data()
+    st.sidebar.subheader("Data Exploration")
+    st.sidebar.write(data.head())
 
-if type(data) != type("No Result"):
-    item_count = data.groupby(['Member_number', 'itemDescription'])["itemDescription"].count().reset_index(name="Count")
-    item_count_pivot = item_count.pivot_table(index='Member_number', columns='itemDescription', values='Count', aggfunc='sum').fillna(0)
-    item_count_pivot = item_count_pivot.applymap(encode)
+    # Preprocess data
+    data = preprocess_data(data)
 
-    support = 0.01
-    frequent_items = apriori(item_count_pivot, min_support=support, use_colnames=True)
+    # Mine association rules
+    min_support = st.sidebar.slider("Select Minimum Support", min_value=0.01, max_value=0.5, step=0.01, value=0.01)
+    rules = mine_association_rules(data, min_support)
 
-    metric = "lift"
-    min_threshold = 1
+    st.sidebar.subheader("Association Rules")
+    st.sidebar.write(rules.head())
 
-    rules = association_rules(frequent_items, metric=metric, min_threshold=min_threshold)[["antecedents", "consequents", "support", "confidence", "lift"]]
-    rules.sort_values('confidence', ascending=False, inplace=True)
+    # Draw network graph
+    st.subheader("Association Rules Network Graph")
+    rules_to_show = st.sidebar.slider("Number of Rules to Show", min_value=5, max_value=len(rules), value=10)
+    draw_graph(rules, rules_to_show)
 
-def parse_list(x):
-    x = list(x)
-    return x[0] if len(x) == 1 else ", ".join(x)
-
-def return_item_df(item_antecedents):
-    data = rules[["antecedents", "consequents"]].copy()
-
-    data["antecedents"] = data["antecedents"].apply(parse_list)
-    data["consequents"] = data["consequents"].apply(parse_list)
-
-    filtered_data = data.loc[data["antecedents"] == item_antecedents]
-
-    if not filtered_data.empty:
-        return list(filtered_data.iloc[0, :])
-    else:
-        return []
-
-if type(data) != type("No Result!"):
-    st.markdown("Hasil Rekomendasi : ")
-    result = return_item_df(item)
-    if result:
-        st.success(f"Jika Konsumen Membeli **{item}**, maka membeli **{return_item_df(item)[1]}** secara bersamaan")
-    else:
-        st.warning("Tidak ditemukan rekomendasi untuk item yang dipilih")
+if __name__ == "__main__":
+    main()
