@@ -25,7 +25,7 @@ def get_data( month ='' , day = ''):
     return filtered if filtered.shape[0] else "No Result!"
 
 def user_input_features():
-    item = st.selectbox("Item", ['Bread','cookies','other vegetables','rolls/buns','soda','yogurt','root vegetables','tropical fruit','bottled water','sausage','citrus fruit','pastry','pip fruit','shopping bags','canned beer','bottled beer','whipped/sour cream','newspapers','frankfurter','brown bread','pork','domestic eggs','butter','fruit/vegetable juice','beef','curd'])
+    item = st.selectbox("Item", ['Bread','Scandinavian','Hot chocolate','Cookies','Muffin','Pastry','Medialuna','Tea','Fudge'])
     month = st.select_slider("Month", ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"])
     day = st.select_slider("Day", ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"], value='Senin')
 
