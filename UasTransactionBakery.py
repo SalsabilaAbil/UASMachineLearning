@@ -4,7 +4,7 @@ from mlxtend.frequent_patterns import association_rules, apriori
 
 # Masukkan data Anda atau gunakan data dummy untuk tujuan demonstrasi
 # Misalnya, gantilah 'your_data.csv' dengan nama file data Anda
-data = pd.read_csv('your_data.csv')
+data = pd.read_csv('transactions-from-a-bakery/BreadBasket_DMS.csv')
 
 # Preprocessing data
 data["Item"] = data["Item"].apply(lambda item: item.lower())
