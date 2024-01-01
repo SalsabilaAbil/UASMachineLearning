@@ -1,39 +1,46 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-import networkx as nx
+from mlxtend.frequent_patterns import apriori
+from mlxtend.frequent_patterns import association_rules
 
-# Sample data (replace this with your actual data)
-data = {'antecedents': [['A'], ['B'], ['C'], ['D']],
-        'consequents': [['X'], ['Y'], ['Z'], ['W']],
-        'support': [0.2, 0.3, 0.1, 0.4],
-        'confidence': [0.8, 0.6, 0.9, 0.7],
-        'lift': [1.2, 1.4, 1.1, 1.3]}
+# Function to generate association rules using Apriori algorithm
+def generate_association_rules(data, min_support, min_confidence):
+    # Apriori algorithm
+    frequent_itemsets = apriori(data, min_support=min_support, use_colnames=True)
 
-rules = pd.DataFrame(data)
+    # Association rules
+    rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
+    
+    return rules
 
-# Scatterplot matrix
-plt.figure(figsize=(10, 10))
-plt.style.use('seaborn-white')
+# Streamlit app
+def main():
+    st.title("Association Rule Mining with Apriori Algorithm")
 
-plt.subplot(221)
-sns.scatterplot(x="support", y="confidence", data=rules)
-st.pyplot()
+    # Upload CSV file
+    st.sidebar.header("Upload Data")
+    uploaded_file = st.sidebar.file_uploader("Choose a CSV file", type=["csv"])
 
-plt.subplot(222)
-sns.scatterplot(x="support", y="lift", data=rules)
-st.pyplot()
+    if uploaded_file is not None:
+        st.sidebar.success("File uploaded successfully!")
 
-plt.subplot(223)
-sns.scatterplot(x="confidence", y="lift", data=rules)
-st.pyplot()
+        # Load data
+        data = pd.read_csv(uploaded_file)
 
-# Network graph
-st.write("Network Graph:")
-draw_graph(rules, 4)
-st.pyplot()
+        # Display the raw data
+        st.subheader("Raw Data")
+        st.write(data)
 
-# Streamlit app with your graph drawing function
-st.write("Custom Graph:")
-draw_graph(rules, 4)
-st.pyplot()
+        # Set parameters
+        min_support = st.sidebar.slider("Minimum Support", 0.0, 1.0, 0.1, step=0.01)
+        min_confidence = st.sidebar.slider("Minimum Confidence", 0.0, 1.0, 0.5, step=0.01)
+
+        # Generate association rules
+        rules = generate_association_rules(data, min_support, min_confidence)
+
+        # Display association rules
+        st.subheader("Association Rules")
+        st.write(rules)
+
+if __name__ == "__main__":
+    main()
