@@ -24,7 +24,7 @@ def get_data(month='', day=''):
     return filtered if not filtered.empty else "No Result!"
 
 def user_input_features():
-    item = st.selectbox("Item", df['itemDescription'].unique())
+    item = st.selectbox("Item", df['Product'].unique())
     month = st.select_slider("Month", ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"])
     day = st.select_slider("Day", ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], value='Senin')
 
