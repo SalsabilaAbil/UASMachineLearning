@@ -1,52 +1,47 @@
 import streamlit as st
 import pandas as pd
-from apyori import apriori
+from mlxtend.frequent_patterns import association_rules, apriori
 
-# Fungsi untuk membaca data CSV
-def load_data():
-    data = pd.read_csv("transactions-from-a-bakery/BreadBasket_DMS.csv")  # Ganti dengan path file CSV Anda
-    return data
+# Masukkan data Anda atau gunakan data dummy untuk tujuan demonstrasi
+# Misalnya, gantilah 'your_data.csv' dengan nama file data Anda
+data = pd.read_csv('your_data.csv')
 
-# Fungsi untuk menerapkan algoritma Apriori
-def run_apriori(data, min_support, min_confidence):
-    records = []
-    for i in range(len(data)):
-        records.append([str(data.values[i, j]) for j in range(data.shape[1])])
+# Preprocessing data
+data["Item"] = data["Item"].apply(lambda item: item.lower())
+data["Item"] = data["Item"].apply(lambda item: item.strip())
+data = data[["Transaction", "Item"]].copy()
 
-    # Menjalankan algoritma Apriori
-    results = list(apriori(records, min_support=min_support, min_confidence=min_confidence))
+# Membuat pivot table
+item_count = data.groupby(["Transaction", "Item"])["Item"].count().reset_index(name="Count")
+item_count_pivot = item_count.pivot_table(index='Transaction', columns='Item', values='Count', aggfunc='sum').fillna(0)
+item_count_pivot = item_count_pivot.astype("int32")
+item_count_pivot = item_count_pivot.applymap(lambda x: 1 if x >= 1 else 0)
 
-    return results
+# Menjalankan algoritma Apriori
+support = 0.01
+frequent_items = apriori(item_count_pivot, min_support=support, use_colnames=True)
 
-# Fungsi untuk menampilkan hasil analisis asosiasi
-def display_results(results):
-    st.header("Hasil Analisis Asosiasi menggunakan Algoritma Apriori")
-    for rule in results:
-        st.write(f"Rule: {', '.join(rule.items)}")
-        st.write(f"Support: {rule.support}")
-        st.write(f"Confidence: {rule.confidence}")
-        st.write(f"Lift: {rule.lift}")
-        st.write("---")
+# Menjalankan aturan asosiasi
+metric = "lift"
+min_threshold = 1
+rules = association_rules(frequent_items, metric=metric, min_threshold=min_threshold)[["antecedents", "consequents", "support", "confidence", "lift"]]
+rules.sort_values('confidence', ascending=False, inplace=True)
 
-def main():
-    st.title("Aplikasi Analisis Asosiasi dengan Algoritma Apriori")
+# Menjalankan aplikasi Streamlit
+st.title('Association Rule Mining with Streamlit')
+st.sidebar.header('Settings')
 
-    # Memuat data
-    data = load_data()
+# Menampilkan tabel aturan asosiasi
+st.subheader('Association Rules')
+st.write(rules.head(15))
 
-    # Menampilkan data
-    st.subheader("Data:")
-    st.write(data)
+# Menampilkan scatter plot matrix
+st.subheader('Scatter Plot Matrix')
+st.pyplot()
 
-    # Parameter untuk algoritma Apriori
-    min_support = st.slider("Minimum Support", 0.0, 1.0, 0.1)
-    min_confidence = st.slider("Minimum Confidence", 0.0, 1.0, 0.5)
+# Menampilkan graf asosiasi
+st.subheader('Association Graph')
+st.pyplot()
 
-    # Menjalankan algoritma Apriori
-    results = run_apriori(data, min_support, min_confidence)
-
-    # Menampilkan hasil analisis
-    display_results(results)
-
-if __name__ == "__main__":
-    main()
+# Catatan: Untuk scatter plot dan graf, Anda perlu menyesuaikan kode di bagian visualisasi
+# karena Streamlit tidak secara otomatis menangani beberapa subplot.
