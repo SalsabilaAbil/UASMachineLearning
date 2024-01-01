@@ -12,6 +12,14 @@ data = pd.read_csv('TransactionFromBakery.csv')
 
 # ... (Your existing data preprocessing and mining code)
 
+# Check if seaborn is installed, if not, install it
+try:
+    import seaborn
+except ImportError:
+    st.warning("Seaborn not found. Installing seaborn...")
+    !pip install seaborn
+    import seaborn as sns
+
 # Streamlit App
 st.title('Association Rule Mining with Streamlit')
 
@@ -30,5 +38,8 @@ st.pyplot(fig)
 # Network Graph
 st.header('Network Graph of Association Rules')
 fig_network = plt.figure(figsize=(10, 10))
-draw_graph(rules, 10)
+# Assuming 'draw_graph' is a function you have defined elsewhere
+# You need to provide the implementation of 'draw_graph'
+# Replace the following line with the actual call to draw the graph
+draw_graph(rules, 10)  
 st.pyplot(fig_network)
