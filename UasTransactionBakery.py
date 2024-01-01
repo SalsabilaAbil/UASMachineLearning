@@ -3,6 +3,15 @@ import pandas as pd
 from mlxtend.frequent_patterns import apriori
 from mlxtend.frequent_patterns import association_rules
 
+# Install mlxtend if not already installed
+try:
+    import mlxtend
+except ImportError:
+    st.warning("Installing mlxtend. Please wait...")
+    st.code("pip install mlxtend")
+    !pip install mlxtend
+    st.success("mlxtend installed successfully. Please rerun the app.")
+
 # Function to generate association rules using Apriori algorithm
 def generate_association_rules(data, min_support, min_confidence):
     # Apriori algorithm
