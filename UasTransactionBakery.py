@@ -1,51 +1,52 @@
 import streamlit as st
 import pandas as pd
-from mlxtend.frequent_patterns import apriori
-from mlxtend.frequent_patterns import association_rules
+from apyori import apriori
 
-# Install mlxtend if not already installed
-try:
-    import mlxtend
-except ImportError:
-    st.warning("Installing mlxtend. Please wait...")
-    st.code("pip install mlxtend")
-    st.success("mlxtend installed successfully. Please rerun the app.")
+# Fungsi untuk membaca data CSV
+def load_data():
+    data = pd.read_csv("path/to/your/data.csv")  # Ganti dengan path file CSV Anda
+    return data
 
-# Function to generate association rules using Apriori algorithm
-def generate_association_rules(data, min_support, min_confidence):
-    # Apriori algorithm
-    frequent_itemsets = apriori(data, min_support=min_support, use_colnames=True)
+# Fungsi untuk menerapkan algoritma Apriori
+def run_apriori(data, min_support, min_confidence):
+    records = []
+    for i in range(len(data)):
+        records.append([str(data.values[i, j]) for j in range(data.shape[1])])
 
-    # Association rules
-    rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=min_confidence)
-    
-    return rules
+    # Menjalankan algoritma Apriori
+    results = list(apriori(records, min_support=min_support, min_confidence=min_confidence))
 
-# Streamlit app
+    return results
+
+# Fungsi untuk menampilkan hasil analisis asosiasi
+def display_results(results):
+    st.header("Hasil Analisis Asosiasi menggunakan Algoritma Apriori")
+    for rule in results:
+        st.write(f"Rule: {', '.join(rule.items)}")
+        st.write(f"Support: {rule.support}")
+        st.write(f"Confidence: {rule.confidence}")
+        st.write(f"Lift: {rule.lift}")
+        st.write("---")
+
 def main():
-    st.title("Association Rule Mining with Apriori Algorithm")
+    st.title("Aplikasi Analisis Asosiasi dengan Algoritma Apriori")
 
-    # Upload CSV file
-    uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
+    # Memuat data
+    data = load_data()
 
-    if uploaded_file is not None:
-        # Load data
-        data = pd.read_csv(uploaded_file)
+    # Menampilkan data
+    st.subheader("Data:")
+    st.write(data)
 
-        # Display the raw data
-        st.subheader("Raw Data")
-        st.write(data)
+    # Parameter untuk algoritma Apriori
+    min_support = st.slider("Minimum Support", 0.0, 1.0, 0.1)
+    min_confidence = st.slider("Minimum Confidence", 0.0, 1.0, 0.5)
 
-        # Set parameters
-        min_support = st.slider("Minimum Support", 0.0, 1.0, 0.1, step=0.01)
-        min_confidence = st.slider("Minimum Confidence", 0.0, 1.0, 0.5, step=0.01)
+    # Menjalankan algoritma Apriori
+    results = run_apriori(data, min_support, min_confidence)
 
-        # Generate association rules
-        rules = generate_association_rules(data, min_support, min_confidence)
-
-        # Display association rules
-        st.subheader("Association Rules")
-        st.write(rules)
+    # Menampilkan hasil analisis
+    display_results(results)
 
 if __name__ == "__main__":
     main()
