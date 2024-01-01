@@ -8,7 +8,7 @@ from mlxtend.frequent_patterns import association_rules
 import networkx as nx
 
 # Load your data (replace 'your_data.csv' with your actual data file)
-data = pd.read_csv('your_data.csv')
+data = pd.read_csv('TransactionFromBakery.csv')
 
 # ... (Your existing data preprocessing and mining code)
 
