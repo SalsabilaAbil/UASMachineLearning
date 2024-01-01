@@ -1,9 +1,11 @@
+# Import necessary libraries
 import streamlit as st
 import networkx as nx
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+# Function to draw the graph
 def draw_graph(rules, rules_to_show):
     G1 = nx.DiGraph()
 
@@ -54,10 +56,10 @@ data = {
 
 rules = pd.DataFrame(data)
 
-# Streamlit app
+# Main Streamlit app
 def main():
     st.title("Rule Graph Visualization")
-    
+
     # Sidebar
     rules_to_show = st.sidebar.slider("Number of Rules to Show", 1, len(rules), 5)
 
