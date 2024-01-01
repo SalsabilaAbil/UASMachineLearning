@@ -20,17 +20,19 @@ plt.style.use('seaborn-white')
 
 plt.subplot(221)
 sns.scatterplot(x="support", y="confidence", data=rules)
+st.pyplot()
 
 plt.subplot(222)
 sns.scatterplot(x="support", y="lift", data=rules)
+st.pyplot()
 
 plt.subplot(223)
 sns.scatterplot(x="confidence", y="lift", data=rules)
-
 st.pyplot()
 
 # Network graph
 st.write("Network Graph:")
+draw_graph(rules, 4)
 st.pyplot()
 
 # Streamlit app with your graph drawing function
