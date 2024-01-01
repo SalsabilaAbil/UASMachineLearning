@@ -2,43 +2,38 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from mlxtend.frequent_patterns import apriori
-from mlxtend.frequent_patterns import association_rules
+import seaborn as sns
 import networkx as nx
 
-# Load your data (replace 'your_data.csv' with your actual data file)
-data = pd.read_csv('TransactionFromBakery.csv')
+# Sample data (replace this with your actual data)
+data = {'antecedents': [['A'], ['B'], ['C'], ['D']],
+        'consequents': [['X'], ['Y'], ['Z'], ['W']],
+        'support': [0.2, 0.3, 0.1, 0.4],
+        'confidence': [0.8, 0.6, 0.9, 0.7],
+        'lift': [1.2, 1.4, 1.1, 1.3]}
 
-# ... (Your existing data preprocessing and mining code)
+rules = pd.DataFrame(data)
 
-# Check if seaborn is installed, if not, install it
-try:
-    import seaborn
-except ImportError:
-    st.warning("Seaborn not found. Installing seaborn...")
-    !pip install seaborn
-    import seaborn as sns
+# Scatterplot matrix
+plt.figure(figsize=(10, 10))
+plt.style.use('seaborn-white')
 
-# Streamlit App
-st.title('Association Rule Mining with Streamlit')
+plt.subplot(221)
+sns.scatterplot(x="support", y="confidence", data=rules)
 
-# Display the top 10 association rules
-st.header('Top 10 Association Rules')
-st.table(rules.head(10))
+plt.subplot(222)
+sns.scatterplot(x="support", y="lift", data=rules)
 
-# Scatter plots
-st.header('Scatter Plots')
-fig, axes = plt.subplots(2, 2, figsize=(10, 10))
-sns.scatterplot(x="support", y="confidence", data=rules, ax=axes[0, 0])
-sns.scatterplot(x="support", y="lift", data=rules, ax=axes[0, 1])
-sns.scatterplot(x="confidence", y="lift", data=rules, ax=axes[1, 0])
-st.pyplot(fig)
+plt.subplot(223)
+sns.scatterplot(x="confidence", y="lift", data=rules)
 
-# Network Graph
-st.header('Network Graph of Association Rules')
-fig_network = plt.figure(figsize=(10, 10))
-# Assuming 'draw_graph' is a function you have defined elsewhere
-# You need to provide the implementation of 'draw_graph'
-# Replace the following line with the actual call to draw the graph
-draw_graph(rules, 10)  
-st.pyplot(fig_network)
+st.pyplot()
+
+# Network graph
+st.write("Network Graph:")
+st.pyplot()
+
+# Streamlit app with your graph drawing function
+st.write("Custom Graph:")
+draw_graph(rules, 4)
+st.pyplot()
