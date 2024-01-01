@@ -2,49 +2,75 @@ import streamlit as st
 import pandas as pd
 from mlxtend.frequent_patterns import association_rules, apriori
 
-# Load data
-@st.cache  # Use caching to avoid reloading data on every interaction
-def load_data():
-    return pd.read_csv('transactions-from-a-bakery/BreadBasket_DMS.csv')
+# Load the dataset
+df = pd.read_csv('Groceries_dataset.csv')
+df['Date'] = pd.to_datetime(df['Date'], format="%d-%m-%Y")
 
-data = load_data()
+df["month"] = df['Date'].dt.month
+df["day"] = df['Date'].dt.weekday
 
-# Preprocess data
-data["Item"] = data["Item"].apply(lambda item: item.lower())
-data["Item"] = data["Item"].apply(lambda item: item.strip())
-data = data[["Transaction", "Item"]].copy()
+df["month"].replace([i for i in range(1, 12 + 1)], ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"], inplace=True)
+df["day"].replace([i for i in range(6 + 1)], ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], inplace=True)
 
-# Create pivot table
-item_count = data.groupby(["Transaction", "Item"])["Item"].count().reset_index(name="Count")
-item_count_pivot = item_count.pivot_table(index='Transaction', columns='Item', values='Count', aggfunc='sum').fillna(0)
-item_count_pivot = item_count_pivot.astype("int32")
-item_count_pivot = item_count_pivot.applymap(lambda x: 1 if x >= 1 else 0)
+st.title("UAS Grocery Basket Analysis Algoritma Apriori")
 
-# Run Apriori algorithm
-support = 0.01
-frequent_items = apriori(item_count_pivot, min_support=support, use_colnames=True)
+def get_data(month='', day=''):
+    data = df.copy()
+    filtered = data.loc[
+        (data["month"].str.contains(month.title())) &
+        (data["day"].str.contains(day.title()))
+    ]
+    return filtered if not filtered.empty else "No Result!"
 
-# Run association rules
-metric = "lift"
-min_threshold = 1
-rules = association_rules(frequent_items, metric=metric, min_threshold=min_threshold)[["antecedents", "consequents", "support", "confidence", "lift"]]
-rules.sort_values('confidence', ascending=False, inplace=True)
+def user_input_features():
+    item = st.selectbox("Item", df['itemDescription'].unique())
+    month = st.select_slider("Month", ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"])
+    day = st.select_slider("Day", ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"], value='Senin')
 
-# Streamlit App
-st.title('Association Rule Mining with Streamlit')
-st.sidebar.header('Settings')
+    return item, month, day
 
-# Display association rules
-st.subheader('Association Rules')
-st.write(rules.head(15))
+item, month, day = user_input_features()
 
-# Display scatter plot matrix
-st.subheader('Scatter Plot Matrix')
-st.pyplot()
+data = get_data(month, day)
 
-# Display association graph
-st.subheader('Association Graph')
-st.pyplot()
+def encode(x):
+    return 1 if x >= 1 else 0
 
-# Note: For the scatter plot and graph, you may need to adjust the visualization code
-# as Streamlit does not automatically handle multiple subplots.
+if type(data) != type("No Result"):
+    item_count = data.groupby(['Member_number', 'itemDescription'])["itemDescription"].count().reset_index(name="Count")
+    item_count_pivot = item_count.pivot_table(index='Member_number', columns='itemDescription', values='Count', aggfunc='sum').fillna(0)
+    item_count_pivot = item_count_pivot.applymap(encode)
+
+    support = 0.01
+    frequent_items = apriori(item_count_pivot, min_support=support, use_colnames=True)
+
+    metric = "lift"
+    min_threshold = 1
+
+    rules = association_rules(frequent_items, metric=metric, min_threshold=min_threshold)[["antecedents", "consequents", "support", "confidence", "lift"]]
+    rules.sort_values('confidence', ascending=False, inplace=True)
+
+def parse_list(x):
+    x = list(x)
+    return x[0] if len(x) == 1 else ", ".join(x)
+
+def return_item_df(item_antecedents):
+    data = rules[["antecedents", "consequents"]].copy()
+
+    data["antecedents"] = data["antecedents"].apply(parse_list)
+    data["consequents"] = data["consequents"].apply(parse_list)
+
+    filtered_data = data.loc[data["antecedents"] == item_antecedents]
+
+    if not filtered_data.empty:
+        return list(filtered_data.iloc[0, :])
+    else:
+        return []
+
+if type(data) != type("No Result!"):
+    st.markdown("Hasil Rekomendasi : ")
+    result = return_item_df(item)
+    if result:
+        st.success(f"Jika Konsumen Membeli **{item}**, maka membeli **{return_item_df(item)[1]}** secara bersamaan")
+    else:
+        st.warning("Tidak ditemukan rekomendasi untuk item yang dipilih")
