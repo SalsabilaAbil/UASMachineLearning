@@ -9,7 +9,6 @@ try:
 except ImportError:
     st.warning("Installing mlxtend. Please wait...")
     st.code("pip install mlxtend")
-    !pip install mlxtend
     st.success("mlxtend installed successfully. Please rerun the app.")
 
 # Function to generate association rules using Apriori algorithm
