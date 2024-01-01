@@ -4,7 +4,7 @@ from apyori import apriori
 
 # Fungsi untuk membaca data CSV
 def load_data():
-    data = pd.read_csv("path/to/your/data.csv")  # Ganti dengan path file CSV Anda
+    data = pd.read_csv("transactions-from-a-bakery/BreadBasket_DMS.csv")  # Ganti dengan path file CSV Anda
     return data
 
 # Fungsi untuk menerapkan algoritma Apriori
