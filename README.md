@@ -10,10 +10,10 @@ Project ini bertujuan untuk melihat kumpulan data transaksi dari sebuah toko rot
 Pada model ini kita dapat meningkatkan strategi pemasaran serta meningkatkan efisiensi operasional. Adapun pada model ini kita dapat mengidentifikasi waktu pembelian terbanyak untuk mengatur persediaan dan tenaga kerja dan menentukan produk paling populer untuk mengoptimalkan stok.
 
 ## Problem Statements
-Dari dataset yang kita punya Tidak ada pemahaman tentang produk mana yang sering dibeli bersamaan ataupun sulitnya mengetahui produk mana yang paling diminati pelanggan, itu menyebabkan kesulitan dalam perencanaan persediaan dan strategi pemasaran yang efektif.
+Jadi, dari data yang ada, kita kesulitan memahami info tentang produk yang biasanya dibeli secara bersamaan atau produk favorit pelanggan. Itu yang bikin susah buat atur stok dan strategi pemasaran yang efektif.
 
 ## Goals
-Meningkatkan pemahaman produk-produk yang populer dan meningkatkan pemahaman pola pembelian pelanggan.
+Selanjutnya, kita perlu lebih paham tentang produk yang lagi hits dan ngerti pola belanja pelanggan agar bisa nge-boost strategi pemasarannya
 
 ## Solution Statements
 Pada model ini kita dapat mengelola persediaan dengan melihat produk yang paling laris dan menganalisis data transaksi.
@@ -57,7 +57,7 @@ Kode berikut untuk mengesktrak isi dari file "transactions-from-a-bakery.zip" ke
 !ls transactions-from-a-bakery
 ```
 
-Kode dibawah berfungsi untuk mengimpor beberapa pustaka yang umum digunakan untuk analisis data dan visualisasi. NumPy adalah pustaka yang menyediakan dukungan untuk array dan operasi matematika pada array, pandas adalah pustaka yang digunakan untuk manipulasi dan analisis data, matplotlib adalah pustaka visualisasi data di Python dan seaborn adalah pustaka visualisasi data yang dibangun di atas Matplotlib untuk membuat plot yang menarik
+Kode di bawah ini digunain buat nge-load beberapa pustaka yang sering dipake buat analisis data dan bikin grafik. NumPy buat dukung array dan operasi matematika, pandas buat ngolah dan analisis data, matplotlib buat bikin grafik di Python, dan seaborn itu upgrade-nya matplotlib buat plot yang lebih bagus.
 
 ```javascript
 import numpy as np
@@ -66,7 +66,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 ```
 
-Selanjutnya kode ini berfungsi untuk membaca data transaksi toko roti dari file CSV, mencetak bentuk DataFrame, dan menampilkan beberapa baris pertama dari data tersebut.
+setelah ini, kode bakal baca data transaksi toko roti dari file CSV. Trus, dia bakal nge-print bentuk DataFrame-nya dan nunjukin beberapa baris awal data itu. Jadi, ini merupakan langkah awal buat ngulik data toko roti.
 
 ```javascript
 data = pd.read_csv("transactions-from-a-bakery/BreadBasket_DMS.csv")
@@ -87,7 +87,7 @@ Kode dibawah berfungsi untuk mengetahui tipe data dari kolom "Date" dalam sebuah
 data["Date"].dtype
 ```
 
-Pada kode ini saya menambahkan 2 kolom baru yaitu 'Month' dan 'Day'. Kode tersebut untuk mengekstrak bulan dan hari dalam seminggu dari kolom bernama 'Date' dan menetapkan nilai-nilai tersebut ke dalam kolom baru.
+Kode ini buat ambil informasi bulan sama hari dari kolom 'Date' lalu dimasukkan ke kolom-kolom baru itu. Jadi, bisa lebih mudah membaca data berdasarkan bulan atau hari dalam seminggu nanti.
 
 ```javascript
 data["month"] = data['Date'].dt.month
@@ -98,7 +98,7 @@ data.head()
 ## EDA
 - Transaksi tiap bulan
 
-berfungsi untuk mengelompokkan data berdasarkan bulan dan menghitung jumlah transaksi untuk setiap bulan. Hasilnya disusun ulang sehingga dimulai dari bulan Oktober hingga April. Selanjutnya, kode menggunakan Seaborn untuk membuat diagram batang (bar plot) yang menampilkan jumlah transaksi tiap bulan dari Oktober hingga April.
+kode ini fungsinya buat ngelompokin data berdasarkan bulan, terus diitung jumlah transaksinya tiap bulan. Lalu, hasilnya diurutin dari Oktober sampe April. Terakhir, pake Seaborn buat bikin diagram batang (bar plot) yang nunjukin jumlah transaksi tiap bulan dari Oktober sampe April. Jadi, bisa keliatan trendnya selama periode itu.
 
 ```javascript
 data_perbulan = data.groupby('month')['Transaction'].count()
@@ -136,13 +136,13 @@ plt.show()
 
 <img src="image2.png"/>
 
-Selanjutnya saya menggunakan kode berikut untuk mengelompokkan data berdasarkan kolom 'Transaction' dan menghitung jumlah item yang terdapat dalam setiap transaksi. 
+Selanjutnya, kode berikut untuk ngelompokkin data dari kolom 'Transaction' dan ngehitung jumlah item yang ada dalam setiap transaksi. 
 
 ```javascript
 member_shopping_frequency = data.groupby('Transaction')['Item'].count().sort_values(ascending=False)
 print(member_shopping_frequency)
 ```
-Kode berikut digunakan untuk membuat histogram menggunakan library Seaborn (sns.histplot). Histogram ini menampilkan distribusi frekuensi dari data yang diberikan dalam member_shopping_frequency
+Kode berikut fungsi nya untuk buat histogram menggunakan library Seaborn (sns.histplot). Histogram ini nampilin distribusi frekuensi dari data yang ada dalam member_shopping_frequency
 
 ```javascript
 sns.histplot(member_shopping_frequency, bins=8, kde=False,color='#D5AAD3')
@@ -154,7 +154,7 @@ plt.show()
 
 <img src="image3.png"/>
 
-Selanjutnya untuk mengelompokkan data berdasarkan tanggal ('Date') dan menghitung jumlah transaksi untuk setiap tanggal saya menggunakan kode dibawah ini
+Selanjutnya, untuk mengelompokkan data berdasarkan tanggal ('Date') dan menghitung jumlah transaksi untuk setiap tanggal saya menggunakan kode dibawah ini
 
 ```javascript
 transactions_by_date = data.groupby('Date')['Transaction'].count()
@@ -223,20 +223,20 @@ Kode dibawah ini memiliki fungsi untuk menghapus spasi ekstra di awal dan akhir 
 data["Item"] = data["Item"].apply(lambda item: item.strip())
 ```
 
-Selanjutnya kode dibawah ini berfungsi untuk membuat salinan independen dari dua kolom ("Transaction" dan "Item") dari DataFrame asli dan kemudian menampilkan lima baris pertama dari DataFrame yang telah dipilih.
+Selanjutnya kode dibawah ini berfungsi untuk buat salinan independen dari dua kolom ("Transaction" dan "Item") dari DataFrame asli dan lalu nampilin lima baris pertama dari DataFrame yang dipilih.
 
 ```javascript
 data = data[["Transaction", "Item"]].copy()
 data.head()
 ```
 
-Selanjutnya pada kode ini kita dapat melakukan analisis asosiasi pada data dan mendapatkan aturan yang memberikan wawasan tentang hubungan antara item.
+Selanjutnya pada kode ini kita dapat melakukan analisis asosiasi pada data dan mendapatkan aturan dan wawasan tentang hubungan antara item.
 
 ```javascript
 from mlxtend.frequent_patterns import association_rules, apriori
 ```
 
- untuk menghitung jumlah kemunculan setiap kombinasi "Transaction" dan "Item" dalam dataframe data dan menampilkannya dalam dataframe baru bernama item_count, memerlukan kode berikut
+ untuk menghitung jumlah kemunculan setiap kombinasi "Transaction" dan "Item" dalam dataframe data dan menampilkannya dalam dataframe baru bernama item_count, memerlukan kode berikut.
 
 ```javascript
  item_count = data.groupby(["Transaction", "Item"])["Item"].count().reset_index(name="Count")
@@ -282,7 +282,7 @@ print("Jumlah Transaksi : ", item_count_pivot.shape[0])
 print("Jumlah items :", item_count_pivot.shape[1])
 ```
 
-Kode ini digunakan untuk mengidentifikasi itemset yang sering muncul bersama dalam suatu dataset
+Kode ini bikin identifikasi itemset yang sering muncul bareng dalam satu set data. Jadi, bisa ngebantu liat kombinasi item yang kerap muncul bersama-sama. Lumayan buat ngerti pola pembelian atau kebiasaan lainnya dari data itu.
 
 ```javascript
 support = 0.01
@@ -290,7 +290,7 @@ frequent_items = apriori(item_count_pivot, min_support= support, use_colnames=Tr
 frequent_items.sort_values("support", ascending=False).head(10)
 ```
 
-Kode ini berfungsi untuk menghasilkan aturan asosiasi dari suatu kumpulan item yang sering muncul bersama (frequent items).
+jadi kode ini bikin aturan asosiasi dari sekelompok item yang sering muncul bareng (frequent items). Jadi, bisa dapetin insight tentang hubungan atau pola antar item dalam dataset.
 
 ```javascript
 metric = "lift"
@@ -301,7 +301,7 @@ rules.sort_values('confidence', ascending=False, inplace=True)
 rules.head(15)
 ```
 
-untuk membuat tiga subplot dalam satu gambar (figure) memerlukan kode dibawah ini, dengan ukuran 10x10. Setiap subplot menunjukkan hubungan antara beberapa metrik dari suatu data yang mungkin berkaitan dengan analisis asosiasi atau aturan asosiasi.
+Jadi, untuk bikin tiga subplot dalam satu gambar (figure) dengan ukuran 10x10, saya pakai kode di bawah ini. Setiap subplotnya bakal nunjukin hubungan antara beberapa metrik dari data yang mungkin terkait dengan analisis asosiasi atau aturan asosiasi. Jadi, bisa langsung lihat pola-pola keterkaitan tersebut dalam satu tampilan.
 
 ```javascript
 plt.figure(figsize = (10, 10))
@@ -316,7 +316,7 @@ sns.scatterplot(x="confidence", y="lift",data=rules)
 ```
 <img src="image6.png"/>
 
-kode berikut dirancang untuk memberikan representasi visual dari sekelompok aturan beserta hubungan antara pendahulu dan konsekuensi dalam setiap aturan.
+kode ini dibuat buat ngehasilin representasi visual dari sekelompok aturan, dan nunjukin hubungan antara bagian yang ada di sebelumnya (pendahulu) dan bagian yang keluar setelahnya (konsekuensi) dalam tiap aturan.
 
 ```javascript
 def draw_graph(rules, rules_to_show):
