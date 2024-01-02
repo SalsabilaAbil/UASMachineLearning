@@ -372,7 +372,7 @@ draw_graph(rules, 10)
 ```
 <img src="image7.png"/>
 
-#deployment
+## deployment
 [TrasactionbakeryAPP](https://uasmachinelearning-akjzhvlsh5si7hmeo2fxth.streamlit.app/)
 <img src="image8.png"/>
 
