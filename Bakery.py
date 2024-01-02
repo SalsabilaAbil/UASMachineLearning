@@ -14,7 +14,7 @@ df["day"] = df['Date'].dt.weekday
 df["month"].replace([i for i in range(1, 12 + 1)], ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustur","September","Oktober","November","Desember"], inplace=True)
 df["day"].replace([i for i in range(6 + 1)], ["Senin","Selasa","Rabu","Kamis","Jumat","Sabtu","Minggu"],inplace=True)
 
-st.title("UAS Grocery Basket Analysis Algoritma Apriori")
+st.title("UAS Transaction From a Bakery")
 
 def get_data( month ='' , day = ''):
     data = df.copy()
